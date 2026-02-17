@@ -1,6 +1,27 @@
 const WHATSAPP = "593998631238";
 const ADMIN_PASS = "legion2026";
 
+const cities = [
+  { name: "Quito", lat: -0.1807, lng: -78.4678, main: true },
+  { name: "Guayaquil", lat: -2.1894, lng: -79.8891 },
+  { name: "Ambato", lat: -1.2494, lng: -78.6229 },
+  { name: "Cuenca", lat: -2.9005, lng: -79.0059 },
+  { name: "Machala", lat: -3.2586, lng: -79.9555 },
+  { name: "Sto. Domingo", lat: -0.2386, lng: -79.1778 },
+  { name: "Libertad", lat: -2.2338, lng: -80.9022 },
+  { name: "Tabacundo", lat: 0.2128, lng: -78.0439 },
+  { name: "San Antonio", lat: 0.4889, lng: -77.6789 },
+  { name: "Lago Agrio", lat: 0.0852, lng: -76.9236 },
+  { name: "Otavalo", lat: 0.2346, lng: -78.2626 },
+  { name: "Manta", lat: -0.9621, lng: -80.7127 },
+  { name: "Pedro Vicente Maldonado", lat: 0.0372, lng: -79.4683 },
+  { name: "Vinces", lat: -1.5556, lng: -79.7525 },
+  { name: "Atuntaqui", lat: 0.3322, lng: -78.2144 },
+  { name: "Azogues", lat: -2.7417, lng: -78.8514 },
+  { name: "Samborondón", lat: -1.9737, lng: -79.7597 },
+  { name: "Guamote", lat: -1.6969, lng: -78.0819 }
+];
+
 const defaultCategories = [
   { id: 1, name: "Router" },
   { id: 2, name: "Láser" },
@@ -35,9 +56,21 @@ let slide = 0, slideTimer;
 let videoSlide = 0;
 
 const testimonials = [
-  { name: "Carlos Méndez", company: "Metalúrgica Andina", opinion: "La implementación del láser CNC redujo nuestros tiempos de corte en 42%. Soporte técnico excepcional.", stars: 5 },
-  { name: "Ana Torres", company: "Muebles TecnoWood", opinion: "El router CNCelevó nuestro acabado y precisión. La asesoría fue clave.", stars: 5 },
-  { name: "Javier Ríos", company: "Industrias FerroMax", opinion: "Equipo robusto y muy estable en producción continua. Totalmente recomendados!", stars: 5 }
+  { name: "Karla", opinion: "Excelente atención y máquinas de alta precisión. Totalmente recomendados.", stars: 5 },
+  { name: "Jorge", opinion: "El router CNC de gran formato superó expectativas. Soporte técnico impecable.", stars: 5 },
+  { name: "Pablo", opinion: "Equipo de alto rendimiento para nuestro taller. Muy satisfechos.", stars: 5 },
+  { name: "Wilson", opinion: "La mejor inversión para nuestro negocio. Calidad garantizada.", stars: 5 },
+  { name: "Giovanny", opinion: "Máquina de corte láser profesional. Cumplió todas las expectativas.", stars: 5 },
+  { name: "Vinicio", opinion: "Excelente servicio postventa. Siempre disponibles para cualquier consulta.", stars: 5 },
+  { name: "Oscar", opinion: "Precisión y durabilidad excepcionales. Recomendado 100%.", stars: 5 },
+  { name: "Luis", opinion: "Asesoría técnica de primer nivel. Equipos de última generación.", stars: 5 },
+  { name: "Cristian", opinion: "Rendimiento superior en corte de metal. Máquina confiable.", stars: 5 },
+  { name: "Miguel", opinion: "Gran formato para producción industrial. Calidad excepcional.", stars: 5 },
+  { name: "Nelson", opinion: "El láser LED mejoró nuestra producción. Excelente inversión.", stars: 5 },
+  { name: "Johnny", opinion: "Potencia y precisión en cada trabajo. Totalmente satisfecho.", stars: 5 },
+  { name: "Omar", opinion: "Servicio técnico especializado. Siempre disponibles para ayudarte.", stars: 5 },
+  { name: "Daniel", opinion: "Equipo versátil para diferentes proyectos. Muy buen rendimiento.", stars: 5 },
+  { name: "David", opinion: "Confiabilidad total en producción continua. Recomendado.", stars: 5 }
 ];
 
 const $ = id => document.getElementById(id);
@@ -195,7 +228,7 @@ function checkout() {
 }
 
 function renderTestimonials() {
-  $('testimonialsTrack').innerHTML = testimonials.map(t => `<div class="testimonial-card"><div class="testimonial-stars">${'★'.repeat(t.stars)}</div><p>"${t.opinion}"</p><div class="testimonial-author">${t.name}</div><div class="testimonial-company">${t.company}</div></div>`).join('');
+  $('testimonialsTrack').innerHTML = testimonials.map(t => `<div class="testimonial-card"><div class="testimonial-stars">${'★'.repeat(t.stars)}</div><p>"${t.opinion}"</p><div class="testimonial-author">${t.name}</div></div>`).join('');
   $('sliderDots').innerHTML = testimonials.map((_, i) => `<button class="slider-dot ${i===0?'active':''}" data-i="${i}"></button>`).join('');
 }
 function goSlide(i) { slide = (i + testimonials.length) % testimonials.length; $('testimonialsTrack').style.transform = `translateX(-${slide * 100}%)`; document.querySelectorAll('.slider-dot').forEach((d, x) => d.classList.toggle('active', x === slide)); }
@@ -421,6 +454,47 @@ function resetForm() {
   $('formTitle').textContent = 'Agregar Producto';
 }
 
+function initMap() {
+  const mapContainer = $('ecuador-map');
+  if (!mapContainer) return;
+  
+  const map = L.map('ecuador-map', {
+    center: [-1.5, -79.0],
+    zoom: 7,
+    scrollWheelZoom: false
+  });
+  
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  
+  const redIcon = L.divIcon({
+    className: 'custom-marker',
+    html: '<div style="background:#e63946;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+  });
+  
+  const mainIcon = L.divIcon({
+    className: 'custom-marker main',
+    html: '<div style="background:#e63946;width:24px;height:24px;border-radius:50%;border:4px solid #fff;box-shadow:0 2px 12px rgba(230,57,70,0.5);animation:pulse 2s infinite;"></div><style>@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}</style>',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+  
+  cities.forEach(city => {
+    const popupContent = city.main 
+      ? `<div style="text-align:center;min-width:120px"><strong style="color:#e63946;font-size:16px">${city.name}</strong><br><span style="color:#666;font-size:12px">Sede Principal</span></div>`
+      : `<div style="text-align:center;min-width:100px"><strong style="color:#e63946">${city.name}</strong></div>`;
+    
+    const marker = L.marker([city.lat, city.lng], {
+      icon: city.main ? mainIcon : redIcon
+    }).addTo(map);
+    
+    marker.bindPopup(popupContent);
+  });
+}
+
 function init() {
   initTheme();
   updateAdminBtn();
@@ -435,5 +509,6 @@ function init() {
   updateCartCount();
   startSlide();
   initVideoSlider();
+  initMap();
 }
 document.addEventListener('DOMContentLoaded', init);

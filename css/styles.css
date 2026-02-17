@@ -3,6 +3,7 @@
   --red-dark: #c1121f;
   --red-light: #ff6b6b;
   --bg: #f8f9fa;
+  --bg-secondary: #e8e8e8;
   --bg-soft: #ffffff;
   --bg-card: #ffffff;
   --bg-card-hover: #f0f0f0;
@@ -20,6 +21,7 @@
 
 [data-theme="dark"] {
   --bg: #050505;
+  --bg-secondary: #1a1a1a;
   --bg-soft: #0a0a0a;
   --bg-card: #111111;
   --bg-card-hover: #1a1a1a;
@@ -865,10 +867,46 @@ section {
   pointer-events: none;
 }
 
+.presence-map {
+  margin: 40px auto;
+  max-width: 900px;
+}
+
+#ecuador-map {
+  width: 100%;
+  height: 450px;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px rgba(230, 57, 70, 0.15);
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-sm);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--text-secondary);
+}
+
+.leaflet-control-zoom a {
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255,255,255,0.8) !important;
+}
+
+[data-theme="dark"] .leaflet-control-attribution {
+  background: rgba(0,0,0,0.8) !important;
+  color: #999 !important;
+}
+
 .presence-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
   margin-top: 40px;
 }
 
@@ -1690,6 +1728,12 @@ footer {
 }
 
 @media (max-width: 1200px) {
+  .presence-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
   .presence-grid {
     grid-template-columns: repeat(3, 1fr);
   }

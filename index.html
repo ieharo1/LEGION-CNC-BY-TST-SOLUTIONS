@@ -11,7 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body>
@@ -37,7 +39,7 @@
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg><span class="cart-count" id="cartCount">0</span></button>
-          <button class="admin-btn" id="adminBtn"><span id="adminBtnText">Admin</span></button>
+          <button class="admin-btn" id="adminBtn"><span id="adminBtnText">Administrador</span></button>
           <button class="menu-btn" id="menuBtn"><span></span><span></span><span></span></button>
         </div>
       </div>
@@ -215,48 +217,8 @@
         <h2 class="section-title">Nuestra <span>Presencia</span></h2>
         <p class="section-subtitle">Estamos más cerca de ti. Cobertura en Ecuador y Latinoamérica.</p>
       </div>
-      <div class="presence-grid">
-        <article class="presence-card reveal">
-          <span class="presence-badge">Sede Principal</span>
-          <div class="presence-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg></div>
-          <h3>Quito</h3>
-          <p>Capital - Matriz</p>
-        </article>
-        <article class="presence-card reveal">
-          <div class="presence-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg></div>
-          <h3>Guayaquil</h3>
-          <p>Ciudadela Industrial</p>
-        </article>
-        <article class="presence-card reveal">
-          <div class="presence-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg></div>
-          <h3>Cuenca</h3>
-          <p>Zona Austro</p>
-        </article>
-        <article class="presence-card reveal">
-          <div class="presence-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg></div>
-          <h3>Machala</h3>
-          <p>Zona Sur</p>
-        </article>
-        <article class="presence-card reveal">
-          <div class="presence-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg></div>
-          <h3>Ibarra</h3>
-          <p>Zona Norte</p>
-        </article>
+      <div class="presence-map reveal">
+        <div id="ecuador-map"></div>
       </div>
     </div>
   </section>
@@ -406,7 +368,7 @@
 
   <div class="login-modal" id="loginModal">
     <div class="login-content">
-      <h3>Admin Login</h3>
+      <h3>Acceso Administrador</h3>
       <p>Ingresa la contraseña</p><input type="password" id="adminPassword" placeholder="Contraseña">
       <p class="login-error" id="loginError">Contraseña incorrecta</p>
       <div class="login-actions"><button class="btn btn-outline btn-sm" id="closeLogin">Cancelar</button><button
