@@ -35,9 +35,10 @@ Sitio web de catálogo de productos y servicios para máquinas CNC (Control Num�
 
 - HTML5 + CSS3
 - JavaScript Vanilla
-- LocalStorage para persistencia de datos
+- Firebase (base de datos en la nube)
 - Font Awesome (iconos)
 - Google Fonts (Outfit)
+- Leaflet (mapas)
 
 ## Uso
 
