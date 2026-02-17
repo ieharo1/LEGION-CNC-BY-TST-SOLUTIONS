@@ -14,9 +14,15 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 
-<body style="overflow: hidden;">
+<body>
+  <div id="customAlert" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:18px 40px;border-radius:12px;font-weight:600;font-size:16px;z-index:999999;box-shadow:0 10px 40px rgba(34,197,94,0.4);font-family:Outfit,sans-serif;">
+    <span id="customAlertIcon" style="margin-right:10px;">✓</span><span id="customAlertMsg"></span>
+  </div>
   <div class="loader" id="loader">
     <div class="loader-content">
       <img src="logo_legion_cnc.png" alt="LEGION CNC" class="loader-logo">
@@ -404,8 +410,9 @@
   <div class="login-modal" id="loginModal">
     <div class="login-content">
       <h3>Acceso Administrador</h3>
-      <p>Ingresa la contraseña</p><input type="password" id="adminPassword" placeholder="Contraseña">
-      <p class="login-error" id="loginError">Contraseña incorrecta</p>
+      <div class="field"><input type="email" id="adminEmail" placeholder="Email"></div>
+      <div class="field"><input type="password" id="adminPassword" placeholder="Contraseña"></div>
+      <p class="login-error" id="loginError" style="display:none;">Credenciales incorrectas</p>
       <div class="login-actions"><button class="btn btn-outline btn-sm" id="closeLogin">Cancelar</button><button
           class="btn btn-primary btn-sm" id="loginSubmit">Entrar</button></div>
     </div>
@@ -415,7 +422,11 @@
     <div class="admin-wrapper">
       <div class="admin-nav">
         <a href="#inicio" class="admin-logo" onclick="closeAdmin()"><img src="logo_legion_cnc.png" alt="LEGION CNC"></a>
-        <button class="btn btn-outline btn-sm" id="closeAdmin">Cerrar</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-icon" id="adminThemeToggle" title="Cambiar tema" style="font-size:18px;">🌙</button>
+          <button class="btn btn-outline btn-sm" id="closeAdmin">Cerrar</button>
+          <button class="btn btn-danger btn-sm" onclick="logout()">Salir</button>
+        </div>
       </div>
       <div class="admin-container">
         <div class="admin-header">
@@ -518,7 +529,9 @@
       </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div id="customAlert">
+      <span style="margin-right:10px;">✓</span><span id="customAlertMsg"></span>
+    </div>
     <script src="js/app.js"></script>
 </body>
 

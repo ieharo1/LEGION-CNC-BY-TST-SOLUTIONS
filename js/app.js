@@ -1,5 +1,21 @@
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyARU-2-H5hiGYqwsI6bYaArWC1xCZNkgJU",
+  authDomain: "legion-cnc-by-tst-solutions.firebaseapp.com",
+  databaseURL: "https://legion-cnc-by-tst-solutions-default-rtdb.firebaseio.com",
+  projectId: "legion-cnc-by-tst-solutions",
+  storageBucket: "legion-cnc-by-tst-solutions.firebasestorage.app",
+  messagingSenderId: "147934125836",
+  appId: "1:147934125836:web:904713ef33268ab559f329",
+  measurementId: "G-950X4KR0LX"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+
 const WHATSAPP = "593998631238";
-const ADMIN_PASS = "legion2026";
 
 const cities = [
   { name: "Quito", lat: -0.1807, lng: -78.4678, main: true },
@@ -34,26 +50,18 @@ const defaultProducts = [
   { id: 3, name: "Plasma CNC Forge 2040", category: "Plasma", price: "USD 15,700", image: "https://placehold.co/400x300/0f3460/fff?text=Plasma+CNC", specs: ["Área: 2000 x 4000 mm", "Espesor: hasta 30 mm", "THC automático"], details: ["Antorcha alto rendimiento", "Control altura tiempo real", "Estructura anti vibración"] }
 ];
 
-let categories = JSON.parse(localStorage.getItem('legionCategories')) || defaultCategories;
-let products = JSON.parse(localStorage.getItem('legionProducts')) || defaultProducts;
-if (!categories.length || !products.length || typeof products[0] === 'undefined' || !products[0].name) {
-  localStorage.removeItem('legionCategories');
-  localStorage.removeItem('legionProducts');
-  localStorage.removeItem('legionCart');
-  localStorage.removeItem('legionAdmin');
-  categories = JSON.parse(JSON.stringify(defaultCategories));
-  products = JSON.parse(JSON.stringify(defaultProducts));
-  localStorage.setItem('legionCategories', JSON.stringify(categories));
-  localStorage.setItem('legionProducts', JSON.stringify(products));
-}
+let categories = defaultCategories;
+let products = defaultProducts;
 let cart = JSON.parse(localStorage.getItem('legionCart')) || [];
 let isLoggedIn = localStorage.getItem('legionAdmin') === 'true';
+let currentUser = null;
 let editingId = null;
 let editingCategoryId = null;
 let activeCategory = 'all';
 let imgBase64 = '';
 let slide = 0, slideTimer;
 let videoSlide = 0;
+let firebaseLoaded = false;
 
 const testimonials = [
   { name: "Karla", opinion: "Excelente atención y máquinas de alta precisión. Totalmente recomendados.", stars: 5 },
@@ -81,11 +89,93 @@ function saveData() {
   localStorage.setItem('legionCart', JSON.stringify(cart));
 }
 
-function toast(msg, type = 'error') {
-  const t = $('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type === 'success' ? ' success' : '');
-  setTimeout(() => t.classList.remove('show'), 3000);
+// Firebase sync functions
+function syncToFirebase() {
+  if (!firebaseLoaded) {
+    console.log('Firebase not loaded yet');
+    return;
+  }
+  console.log('Syncing to Firebase:', { categories: categories.length, products: products.length });
+  db.ref('data').set({
+    categories: categories,
+    products: products
+  }).then(function() {
+    console.log('Sync successful!');
+  }).catch(function(err) {
+    console.log('Error syncing to Firebase:', err);
+  });
+}
+
+function loadFromFirebase() {
+  db.ref('data').once('value').then(function(snapshot) {
+    var data = snapshot.val();
+    if (data) {
+      if (data.categories && data.categories.length > 0) {
+        categories = data.categories;
+      }
+      if (data.products && data.products.length > 0) {
+        products = data.products;
+      }
+      localStorage.setItem('legionCategories', JSON.stringify(categories));
+      localStorage.setItem('legionProducts', JSON.stringify(products));
+      renderCategoryTabs();
+      renderProducts();
+      renderAdminProducts();
+      renderAdminCategories();
+      updateCategorySelect();
+    }
+    firebaseLoaded = true;
+  }).catch(function(err) {
+    console.log('Error loading from Firebase:', err);
+    firebaseLoaded = true;
+  });
+}
+
+// Listen for real-time updates
+function setupFirebaseListener() {
+  db.ref('data').on('value', function(snapshot) {
+    var data = snapshot.val();
+    if (data && firebaseLoaded) {
+      if (data.categories && data.categories.length > 0) {
+        categories = data.categories;
+      }
+      if (data.products && data.products.length > 0) {
+        products = data.products;
+      }
+      localStorage.setItem('legionCategories', JSON.stringify(categories));
+      localStorage.setItem('legionProducts', JSON.stringify(products));
+      renderCategoryTabs();
+      renderProducts();
+      if (isLoggedIn) {
+        renderAdminProducts();
+        renderAdminCategories();
+        updateCategorySelect();
+      }
+    }
+  });
+}
+
+function toast(msg, type) {
+  var alertBox = document.getElementById('customAlert');
+  var alertMsg = document.getElementById('customAlertMsg');
+  var alertIcon = document.getElementById('customAlertIcon');
+  
+  alertMsg.textContent = msg;
+  
+  if (type === 'error') {
+    alertBox.style.background = '#dc2626';
+    alertBox.style.boxShadow = '0 10px 40px rgba(220,38,38,0.4)';
+    alertIcon.textContent = '✕';
+  } else {
+    alertBox.style.background = '#22c55e';
+    alertBox.style.boxShadow = '0 10px 40px rgba(34,197,94,0.4)';
+    alertIcon.textContent = '✓';
+  }
+  
+  alertBox.style.display = 'block';
+  setTimeout(function() {
+    alertBox.style.display = 'none';
+  }, 2500);
 }
 
 function initTheme() {
@@ -117,7 +207,18 @@ function initEvents() {
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('legionTheme', next);
     $('themeToggle').textContent = next === 'light' ? '☀️' : '🌙';
+    if ($('adminThemeToggle')) $('adminThemeToggle').textContent = next === 'light' ? '☀️' : '🌙';
   };
+  if ($('adminThemeToggle')) {
+    $('adminThemeToggle').onclick = () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('legionTheme', next);
+      $('themeToggle').textContent = next === 'light' ? '☀️' : '🌙';
+      $('adminThemeToggle').textContent = next === 'light' ? '☀️' : '🌙';
+    };
+  }
   $('searchBtn').onclick = () => renderProducts($('searchInput').value);
   $('searchInput').onkeyup = e => { if(e.key === 'Enter') renderProducts($('searchInput').value); };
   $('productImageFile').onchange = function(e) {
@@ -191,14 +292,21 @@ window.openModal = function(id) {
 function closeModal() { $('productModal').classList.remove('open'); document.body.style.overflow = ''; }
 
 window.addToCart = function(id) {
-  const p = products.find(x => x.id === id);
+  var p = products.find(function(x) { return x.id === id; });
   if (!p) return;
-  const exist = cart.find(x => x.id === id);
+  var exist = cart.find(function(x) { return x.id === id; });
   if (exist) exist.qty++;
-  else cart.push({ ...p, qty: 1 });
+  else cart.push({ id: p.id, name: p.name, category: p.category, price: p.price, image: p.image, qty: 1 });
   saveData();
   updateCartCount();
-  toast(`${p.name} agregado`, 'success');
+  
+  var alertBox = document.getElementById('customAlert');
+  var alertMsg = document.getElementById('customAlertMsg');
+  alertMsg.textContent = p.name + ' agregado al carrito';
+  alertBox.style.display = 'block';
+  setTimeout(function() {
+    alertBox.style.display = 'none';
+  }, 2500);
 };
 function updateCartCount() { $('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0); }
 
@@ -332,8 +440,80 @@ function initMenu() { $('menuBtn').onclick = () => $('navLinks').classList.toggl
 function updateAdminBtn() { $('adminBtn').classList.toggle('active', isLoggedIn); }
 function showLogin() { $('loginModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeLogin() { $('loginModal').classList.remove('open'); $('adminPassword').value = ''; $('loginError').style.display = 'none'; document.body.style.overflow = ''; }
-function login() { if ($('adminPassword').value === ADMIN_PASS) { isLoggedIn = true; localStorage.setItem('legionAdmin', 'true'); closeLogin(); openAdmin(); updateAdminBtn(); toast('Bienvenido', 'success'); } else { $('loginError').style.display = 'block'; } }
-function openAdmin() { $('adminPanel').classList.add('open'); document.body.style.overflow = 'hidden'; renderAdminProducts(); renderAdminCategories(); updateCategorySelect(); }
+function login() {
+  var email = $('adminEmail').value.trim();
+  var password = $('adminPassword').value;
+  
+  if (!email || !password) {
+      toast('Ingresa email y contraseña', 'error');
+      return;
+    }
+    
+    auth.signInWithEmailAndPassword(email, password)
+      .then(function(userCredential) {
+        currentUser = userCredential.user;
+        isLoggedIn = true;
+        localStorage.setItem('legionAdmin', 'true');
+        localStorage.setItem('legionAdminEmail', email);
+        closeLogin();
+        openAdmin();
+        updateAdminBtn();
+        toast('Bienvenido ' + currentUser.email, 'success');
+      })
+      .catch(function(error) {
+        console.log('Login error:', error);
+        if (error.code === 'auth/user-not-found') {
+          toast('Usuario no encontrado', 'error');
+        } else if (error.code === 'auth/wrong-password') {
+          toast('Contraseña incorrecta', 'error');
+        } else if (error.code === 'auth/invalid-email') {
+          toast('Email inválido', 'error');
+        } else {
+          toast('Error: ' + error.message, 'error');
+        }
+      });
+}
+
+function logout() {
+  auth.signOut().then(function() {
+    currentUser = null;
+    isLoggedIn = false;
+    localStorage.removeItem('legionAdmin');
+    localStorage.removeItem('legionAdminEmail');
+    closeAdmin();
+    updateAdminBtn();
+    toast('Sesión cerrada');
+  }).catch(function(error) {
+    console.log('Logout error:', error);
+  });
+}
+
+function checkAuthState() {
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      currentUser = user;
+      isLoggedIn = true;
+      localStorage.setItem('legionAdmin', 'true');
+      localStorage.setItem('legionAdminEmail', user.email);
+      updateAdminBtn();
+    } else {
+      currentUser = null;
+      isLoggedIn = false;
+      localStorage.removeItem('legionAdmin');
+      localStorage.removeItem('legionAdminEmail');
+      updateAdminBtn();
+    }
+  });
+}
+function openAdmin() { 
+  var theme = localStorage.getItem('legionTheme') || 'light';
+  if ($('adminThemeToggle')) $('adminThemeToggle').textContent = theme === 'light' ? '☀️' : '🌙';
+  $('adminPanel').classList.add('open'); 
+  document.body.style.overflow = 'hidden'; 
+  renderAdminProducts(); 
+  renderAdminCategories(); 
+  updateCategorySelect(); 
+}
 function closeAdmin() { $('adminPanel').classList.remove('open'); document.body.style.overflow = ''; editingId = null; editingCategoryId = null; }
 
 function renderAdminProducts() {
@@ -365,7 +545,7 @@ window.editProduct = function(id) {
   switchTab('form');
 };
 
-window.deleteProduct = function(id) { if (!confirm('¿Eliminar?')) return; products = products.filter(x => x.id !== id); saveData(); renderProducts(); renderAdminProducts(); toast('Eliminado', 'success'); };
+window.deleteProduct = function(id) { if (!confirm('¿Eliminar?')) return; products = products.filter(x => x.id !== id); saveData(); syncToFirebase(); renderProducts(); renderAdminProducts(); toast('Eliminado', 'success'); };
 
 window.editCategory = function(id) {
   const c = categories.find(x => x.id === id);
@@ -379,10 +559,11 @@ window.editCategory = function(id) {
 window.deleteCategory = function(id) {
   const c = categories.find(x => x.id === id);
   if (!c) return;
-  if (products.some(p => p.category === c.name)) { toast('No puedes eliminar categorías con productos'); return; }
+  if (products.some(p => p.category === c.name)) { toast('No puedes eliminar categorías con productos', 'error'); return; }
   if (!confirm('¿Eliminar?')) return;
   categories = categories.filter(x => x.id !== id);
   saveData();
+  syncToFirebase();
   renderCategoryTabs();
   renderAdminCategories();
   updateCategorySelect();
@@ -401,7 +582,7 @@ function saveProduct() {
   const specs = $('productSpecs').value.trim().split('\n').filter(x => x.trim());
   const details = $('productDetails').value.trim().split('\n').filter(x => x.trim());
 
-  if (!name || !category || !price || !imgBase64) { toast('Completa todos los campos'); return; }
+  if (!name || !category || !price || !imgBase64) { toast('Completa todos los campos', 'error'); return; }
 
   if (editingId) {
     const i = products.findIndex(x => x.id === editingId);
@@ -414,6 +595,7 @@ function saveProduct() {
   }
 
   saveData();
+  syncToFirebase();
   renderProducts();
   renderAdminProducts();
   renderCategoryTabs();
@@ -422,7 +604,7 @@ function saveProduct() {
 
 function saveCategory() {
   const name = $('categoryName').value.trim();
-  if (!name) { toast('Ingresa el nombre de la categoría'); return; }
+  if (!name) { toast('Ingresa el nombre de la categoría', 'error'); return; }
   if (editingCategoryId) {
     const i = categories.findIndex(x => x.id === editingCategoryId);
     if (i >= 0) categories[i] = { ...categories[i], name };
@@ -433,6 +615,7 @@ function saveCategory() {
     toast('Categoría agregada', 'success');
   }
   saveData();
+  syncToFirebase();
   renderCategoryTabs();
   renderAdminCategories();
   updateCategorySelect();
@@ -512,7 +695,13 @@ function initLoader() {
 }
 
 function init() {
+  console.log('Initializing app...');
   initLoader();
+  checkAuthState();
+  console.log('Loading from Firebase...');
+  loadFromFirebase();
+  console.log('Setting up Firebase listener...');
+  setupFirebaseListener();
   initTheme();
   updateAdminBtn();
   renderCategoryTabs();
@@ -527,5 +716,6 @@ function init() {
   startSlide();
   initVideoSlider();
   initMap();
+  console.log('App initialized');
 }
 document.addEventListener('DOMContentLoaded', init);
