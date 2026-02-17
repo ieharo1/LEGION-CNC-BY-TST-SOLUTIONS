@@ -495,7 +495,24 @@ function initMap() {
   });
 }
 
+function initLoader() {
+  const loader = $('loader');
+  if (!loader) return;
+  
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      loader.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 1800);
+  });
+  
+  setTimeout(() => {
+    loader.classList.add('hidden');
+  }, 3000);
+}
+
 function init() {
+  initLoader();
   initTheme();
   updateAdminBtn();
   renderCategoryTabs();

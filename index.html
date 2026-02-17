@@ -16,7 +16,13 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
-<body>
+<body style="overflow: hidden;">
+  <div class="loader" id="loader">
+    <div class="loader-content">
+      <img src="logo_legion_cnc.png" alt="LEGION CNC" class="loader-logo">
+      <div class="loader-ring"></div>
+    </div>
+  </div>
   <div class="progress" id="progress"></div>
 
   <nav class="navbar" id="navbar">
