@@ -115,7 +115,9 @@
 
 [data-theme="light"] .loader {
   background: #fff;
-} {
+}
+
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -743,41 +745,120 @@ section {
   font-size: 0.9rem;
 }
 
-.about-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 22px;
+.about-intro {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 40px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
 }
 
-.about-card {
+.about-timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--red), var(--red-light));
+  border-radius: 3px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.timeline-item:nth-child(odd) {
+  flex-direction: row-reverse;
+}
+
+.timeline-year {
+  flex: 0 0 120px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--red);
+  padding: 10px;
+  background: var(--bg-card);
+  border: 2px solid var(--red);
+  border-radius: var(--radius-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-content {
+  flex: 1;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--red);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 24px;
   transition: all 0.3s;
 }
 
-.about-card:hover {
-  border-left-color: var(--red-light);
+.timeline-content:hover {
+  border-color: var(--red);
+  box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15);
 }
 
-.about-year {
-  font-size: 2rem;
-  font-weight: 800;
+.timeline-content h3 {
   color: var(--red);
-  display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
 }
 
-.about-card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
+.timeline-content p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 12px;
 }
 
-.about-card p {
+.timeline-content ul {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.timeline-content li {
   color: var(--text-secondary);
   font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.timeline-final {
+  color: var(--text) !important;
+  font-weight: 500;
+  font-size: 1rem !important;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .about-timeline::before {
+    left: 20px;
+  }
+  
+  .timeline-item,
+  .timeline-item:nth-child(odd) {
+    flex-direction: column;
+    padding-left: 50px;
+  }
+  
+  .timeline-year {
+    flex: none;
+    text-align: left;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
 }
 
 .testimonials-wrap {
