@@ -206,6 +206,7 @@ function initVideoSlider() {
   const prevBtn = $('videoPrev');
   const nextBtn = $('videoNext');
   const dotsContainer = $('videoDots');
+  const videosSection = document.querySelector('.videos-section');
   
   if (!track || !prevBtn || !nextBtn || !dotsContainer) return;
   
@@ -215,17 +216,67 @@ function initVideoSlider() {
   
   dotsContainer.innerHTML = Array(total).fill(0).map((_, i) => `<button class="video-dot ${i===0?'active':''}" data-i="${i}"></button>`).join('');
   
+  let videoTimer = null;
+  let isPaused = false;
+  
   window.goVideoSlide = function(i) {
     videoSlide = (i + total) % total;
     track.style.transform = `translateX(-${videoSlide * 100}%)`;
     document.querySelectorAll('.video-dot').forEach((d, x) => d.classList.toggle('active', x === videoSlide));
   };
   
-  prevBtn.addEventListener('click', function() { goVideoSlide(videoSlide - 1); });
-  nextBtn.addEventListener('click', function() { goVideoSlide(videoSlide + 1); });
-  dotsContainer.addEventListener('click', function(e) { const dot = e.target.closest('.video-dot'); if (!dot) return; goVideoSlide(parseInt(dot.dataset.i)); });
+  function startTimer() {
+    if (videoTimer) clearInterval(videoTimer);
+    if (!isPaused) {
+      videoTimer = setInterval(() => {
+        goVideoSlide(videoSlide + 1);
+      }, 6000);
+    }
+  }
   
-  setInterval(() => goVideoSlide(videoSlide + 1), 6000);
+  function pauseSlider() {
+    isPaused = true;
+    if (videoTimer) clearInterval(videoTimer);
+    videoTimer = null;
+  }
+  
+  function resumeSlider() {
+    isPaused = false;
+    startTimer();
+  }
+  
+  startTimer();
+  
+  prevBtn.addEventListener('click', function() { 
+    goVideoSlide(videoSlide - 1); 
+    resumeSlider();
+  });
+  nextBtn.addEventListener('click', function() { 
+    goVideoSlide(videoSlide + 1); 
+    resumeSlider();
+  });
+  dotsContainer.addEventListener('click', function(e) { 
+    const dot = e.target.closest('.video-dot'); 
+    if (!dot) return; 
+    goVideoSlide(parseInt(dot.dataset.i)); 
+    resumeSlider();
+  });
+  
+  if (videosSection) {
+    videosSection.addEventListener('mouseenter', function() {
+      pauseSlider();
+    });
+    videosSection.addEventListener('mouseleave', function() {
+      resumeSlider();
+    });
+  }
+  
+  track.querySelectorAll('iframe').forEach(iframe => {
+    iframe.addEventListener('click', function(e) {
+      e.stopPropagation();
+      pauseSlider();
+    });
+  });
 }
 
 function initContact() {
