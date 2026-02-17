@@ -745,6 +745,44 @@ section {
   font-size: 0.9rem;
 }
 
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 22px;
+}
+
+.about-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: all 0.3s;
+}
+
+.about-card:hover {
+  border-left-color: var(--red-light);
+}
+
+.about-year {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--red);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.about-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.about-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .about-intro {
   text-align: center;
   max-width: 800px;
@@ -758,106 +796,109 @@ section {
   position: relative;
   max-width: 800px;
   margin: 0 auto;
+  padding-left: 40px;
 }
 
 .about-timeline::before {
   content: '';
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 15px;
+  top: 0;
+  bottom: 0;
   width: 3px;
-  height: 100%;
   background: linear-gradient(to bottom, var(--red), var(--red-light));
   border-radius: 3px;
 }
 
 .timeline-item {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 40px;
   position: relative;
+  margin-bottom: 35px;
+  padding-left: 30px;
 }
 
-.timeline-item:nth-child(odd) {
-  flex-direction: row-reverse;
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -34px;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 3px var(--red);
 }
 
 .timeline-year {
-  flex: 0 0 120px;
-  text-align: center;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--red);
-  padding: 10px;
-  background: var(--bg-card);
-  border: 2px solid var(--red);
-  border-radius: var(--radius-sm);
-  position: relative;
-  z-index: 1;
+  margin-bottom: 8px;
 }
 
 .timeline-content {
-  flex: 1;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 20px;
   transition: all 0.3s;
 }
 
 .timeline-content:hover {
   border-color: var(--red);
-  box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15);
+  box-shadow: 0 8px 25px rgba(230, 57, 70, 0.12);
 }
 
 .timeline-content h3 {
   color: var(--red);
-  margin-bottom: 12px;
-  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
 }
 
 .timeline-content p {
   color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.7;
-  margin-bottom: 12px;
-}
-
-.timeline-content ul {
-  margin: 12px 0;
-  padding-left: 20px;
-}
-
-.timeline-content li {
-  color: var(--text-secondary);
   font-size: 0.9rem;
-  margin-bottom: 6px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.timeline-list {
+  margin: 10px 0;
+  padding-left: 18px;
+}
+
+.timeline-list li {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 5px;
 }
 
 .timeline-final {
   color: var(--text) !important;
   font-weight: 500;
-  font-size: 1rem !important;
-  padding-top: 12px;
+  font-size: 0.95rem !important;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
+  margin-top: 10px !important;
 }
 
 @media (max-width: 768px) {
+  .about-timeline {
+    padding-left: 30px;
+  }
+  
   .about-timeline::before {
-    left: 20px;
+    left: 8px;
   }
   
-  .timeline-item,
-  .timeline-item:nth-child(odd) {
-    flex-direction: column;
-    padding-left: 50px;
+  .timeline-item {
+    padding-left: 20px;
   }
   
-  .timeline-year {
-    flex: none;
-    text-align: left;
-    display: inline-block;
-    margin-bottom: 10px;
+  .timeline-item::before {
+    left: -27px;
+    width: 12px;
+    height: 12px;
   }
 }
 
@@ -1888,6 +1929,12 @@ footer {
   }
 }
 
+@media (max-width: 992px) {
+  #ecuador-map {
+    height: 380px;
+  }
+}
+
 @media (max-width: 768px) {
   .presence-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -2267,5 +2314,45 @@ footer {
 
   .admin-footer .admin-socials {
     justify-content: center;
+  }
+
+  #ecuador-map {
+    height: 300px;
+  }
+
+  .about-intro {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  .about-timeline {
+    padding-left: 30px;
+  }
+
+  .timeline-year {
+    font-size: 1.2rem;
+  }
+
+  .timeline-content {
+    padding: 15px;
+  }
+
+  .timeline-content h3 {
+    font-size: 1rem;
+  }
+
+  .timeline-content p,
+  .timeline-list li {
+    font-size: 0.85rem;
+  }
+
+  .loader-logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  .loader-ring {
+    width: 150px;
+    height: 150px;
   }
 }
